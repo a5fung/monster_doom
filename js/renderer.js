@@ -163,33 +163,71 @@ function renderFrame(player, monsters, doorUnlocked, keyExists) {
     const drawStart = Math.max(0, Math.floor((RENDER_H - lineHeight) / 2));
     const drawEnd   = Math.min(RENDER_H - 1, Math.floor((RENDER_H + lineHeight) / 2));
 
-    // Base wall color
-    let wr, wg, wb;
-    if (hit.cell === 2) {
-      // Exit door — brown
-      wr = 85; wg = 51; wb = 17;
-    } else {
-      // Regular wall — N/S brighter than E/W
-      const base = hit.side === 0 ? 170 : 136;
-      wr = base; wg = base; wb = base;
-    }
-
     const fog = fogFactor(perpDist);
     const wallX = hit.wallX;
+    // E/W faces (side=1) are ~75% as bright — simulates perpendicular lighting
+    const sideDim = hit.side === 1 ? 0.75 : 1.0;
+    const span = drawEnd - drawStart + 1 || 1;
 
     for (let y = drawStart; y <= drawEnd; y++) {
-      // Brick texture: mortar at every 8 rows and fractional column positions
-      const texRow = Math.floor(((y - drawStart) / (drawEnd - drawStart + 1)) * 64);
-      const isMortarRow = (texRow % 8 === 0);
-      // Offset mortar columns by half for alternating rows effect
-      const brickRow = Math.floor(texRow / 8);
-      const wallXOff = (brickRow % 2 === 0) ? wallX : (wallX + 0.5) % 1.0;
-      const isMortarCol = (wallXOff * 16) % 1.0 < 0.06;
-      const isMortar = isMortarRow || isMortarCol;
+      let r, g, b;
 
-      let r = isMortar ? Math.round(wr * 0.55) : wr;
-      let g = isMortar ? Math.round(wg * 0.55) : wg;
-      let b = isMortar ? Math.round(wb * 0.55) : wb;
+      if (hit.cell === 2) {
+        // ---- Exit door: dark planked wood ----
+        // Vertical plank lines + horizontal rail bands
+        const texRow = Math.floor(((y - drawStart) / span) * 64);
+        const isRail = texRow === 8 || texRow === 56; // top/bottom rails
+        const plankCol = Math.floor(wallX * 12);
+        const plankX   = (wallX * 12) % 1.0;
+        const isPlankEdge = plankX < 0.06 || plankX > 0.94;
+        if (isRail || isPlankEdge) {
+          r = 55; g = 35; b = 15; // dark edge
+        } else {
+          const grain = ((plankCol * 17 + texRow * 3) ^ (plankCol * 5)) & 0x0F;
+          r = 100 + grain; g = 60 + (grain >> 1); b = 20 + (grain >> 2);
+        }
+      } else {
+        // ---- Brick wall ----
+        // Texture space: 64 rows high, 8 texel rows per brick course
+        const texRow   = Math.floor(((y - drawStart) / span) * 64);
+        const brickRow = Math.floor(texRow / 8);
+        const rowLocal = texRow % 8; // 0..7 within one brick course
+
+        // Stagger every other row by half a brick width
+        const wallXOff  = (brickRow % 2 === 0) ? wallX : (wallX + 0.5) % 1.0;
+        const brickCol  = Math.floor(wallXOff * 8); // up to 8 bricks per unit
+        const colLocal  = (wallXOff * 8) % 1.0;     // 0..1 within one brick
+
+        // Mortar: 1 texel top border + ~6% left border of each brick
+        const isMortarRow = rowLocal === 0;
+        const isMortarCol = colLocal < 0.06;
+
+        if (isMortarRow || isMortarCol) {
+          // Warm gray mortar
+          r = 115; g = 108; b = 98;
+        } else {
+          // Per-brick color variation via cheap integer hash
+          const hash = ((brickRow * 7 + brickCol * 13) ^ (brickRow << 2)) & 0xFF;
+          const v = (hash % 32) - 16; // -16..+15
+
+          // Base reddish-brown brick
+          r = 158 + v;
+          g =  62 + Math.round(v * 0.35);
+          b =  38 + Math.round(v * 0.20);
+
+          // Inner shading: slightly lighter at top, darker toward bottom of each course
+          // rowLocal 1..7 → shade 1.0 down to ~0.82
+          const shade = 1.0 - (rowLocal - 1) * 0.027;
+          r = Math.round(r * shade);
+          g = Math.round(g * shade);
+          b = Math.round(b * shade);
+        }
+      }
+
+      // Side face dimming
+      r = Math.round(r * sideDim);
+      g = Math.round(g * sideDim);
+      b = Math.round(b * sideDim);
 
       const [fr, fg2, fb] = applyFog(r, g, b, fog);
       pixels[y * RENDER_W + c] = toPixel32(fr, fg2, fb);
