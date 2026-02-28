@@ -75,9 +75,29 @@ function hideAllScreens() {
   });
 }
 
+// ---- iOS-safe button wiring ----
+// On iOS Safari a document-level passive:false touchstart suppresses synthetic
+// click events. Fix: stop propagation at the button so the game touch handler
+// never sees it, then fire the action directly on touchend.
+function wireBtn(el, fn) {
+  if (!el) return;
+  // Desktop: plain click
+  el.addEventListener('click', fn);
+  // Mobile: stop the touchstart from reaching document-level game handler,
+  // then fire action on touchend (more reliable than click on iOS Safari).
+  el.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+  }, { passive: true });
+  el.addEventListener('touchend', (e) => {
+    e.preventDefault();   // prevent ghost click
+    e.stopPropagation();
+    fn();
+  }, { passive: false });
+}
+
 // ---- Difficulty buttons ----
 diffBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
+  wireBtn(btn, () => {
     diffBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentDifficulty = btn.dataset.diff;
@@ -188,10 +208,10 @@ function gameLoop(now) {
 }
 
 // ---- Button wiring ----
-if (startBtn) startBtn.addEventListener('click', startGame);
-if (retryBtn) retryBtn.addEventListener('click', startGame);
-if (menuFromWin) menuFromWin.addEventListener('click', goToMenu);
-if (menuFromLose) menuFromLose.addEventListener('click', goToMenu);
+wireBtn(startBtn, startGame);
+wireBtn(retryBtn, startGame);
+wireBtn(menuFromWin, goToMenu);
+wireBtn(menuFromLose, goToMenu);
 
 function goToMenu() {
   if (animId) { cancelAnimationFrame(animId); animId = null; }
