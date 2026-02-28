@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Monster Doom</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Main game canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Portrait warning overlay -->
+  <div id="portraitWarning">
+    <div class="pw-inner">
+      <div class="pw-icon">&#8635;</div>
+      <div>ROTATE DEVICE TO LANDSCAPE</div>
+    </div>
+  </div>
+
+  <!-- Menu screen -->
+  <div id="menuScreen">
+    <div class="menu-inner">
+      <h1 class="game-title">MONSTER<br>DOOM</h1>
+      <p class="menu-subtitle">Stage 1 &mdash; The Labyrinth</p>
+      <div class="difficulty-group">
+        <button class="diff-btn active" data-diff="easy">EASY</button>
+        <button class="diff-btn" data-diff="hard">HARD</button>
+        <button class="diff-btn" data-diff="extreme">EXTREME</button>
+      </div>
+      <div class="diff-desc" id="diffDesc">3 monsters &mdash; 150 HP &mdash; Relaxed</div>
+      <button class="start-btn" id="startBtn">START GAME</button>
+      <div class="menu-hint">
+        <span class="hint-desktop">WASD move &bull; Mouse look &bull; Click / Space to shoot</span>
+        <span class="hint-mobile">Left thumb: move &bull; Right drag: look &bull; FIRE button: shoot</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD layer (always on top while playing) -->
+  <div id="hudLayer">
+    <!-- Crosshair -->
+    <div id="crosshair">+</div>
+
+    <!-- Bottom HUD bar -->
+    <div id="hudBar">
+      <div id="hudLeft">
+        <span id="hudHpNum">100</span>
+        <div id="hudHpBarWrap">
+          <div id="hudHpFill"></div>
+        </div>
+      </div>
+      <div id="hudKey">
+        <span id="keyIcon">&#128273;</span>
+        <span id="keyLabel">KEY</span>
+      </div>
+    </div>
+
+    <!-- Notification area -->
+    <div id="notification"></div>
+  </div>
+
+  <!-- Win screen -->
+  <div id="winScreen">
+    <div class="overlay-inner">
+      <h2 class="win-title">YOU ESCAPED!</h2>
+      <p class="overlay-sub">Stage 1 complete</p>
+      <button class="overlay-btn" id="menuFromWin">MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- Lose screen -->
+  <div id="loseScreen">
+    <div class="overlay-inner">
+      <h2 class="lose-title">YOU DIED</h2>
+      <p class="overlay-sub">The monsters got you...</p>
+      <button class="overlay-btn" id="retryBtn">RETRY</button>
+      <button class="overlay-btn secondary" id="menuFromLose">MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- Mobile controls -->
+  <div id="mobileControls">
+    <div id="joystickBase">
+      <div id="joystickThumb"></div>
+    </div>
+    <button id="fireBtn">FIRE</button>
+  </div>
+
+  <!-- Scripts in load order -->
+  <script src="js/config.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/raycaster.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/monster.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

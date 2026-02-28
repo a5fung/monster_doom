@@ -1,0 +1,333 @@
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Courier New', Courier, monospace;
+  color: #fff;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ===== Game Canvas ===== */
+#gameCanvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ===== Portrait Warning ===== */
+#portraitWarning {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  color: #f44;
+}
+.pw-inner { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.pw-icon { font-size: 3rem; animation: spin 2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (orientation: portrait) {
+  #portraitWarning { display: flex; }
+}
+
+/* ===== Shared Overlay ===== */
+#menuScreen, #winScreen, #loseScreen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.88);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#menuScreen.visible, #winScreen.visible, #loseScreen.visible {
+  display: flex;
+}
+
+.menu-inner, .overlay-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* ===== Menu Screen ===== */
+.game-title {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  color: #f44;
+  text-shadow: 0 0 20px #f44, 0 0 40px #800;
+  letter-spacing: 0.15em;
+  line-height: 1.1;
+}
+
+.menu-subtitle {
+  font-size: 0.9rem;
+  color: #aaa;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.difficulty-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.diff-btn {
+  padding: 0.5rem 1.2rem;
+  background: transparent;
+  border: 2px solid #555;
+  color: #aaa;
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.diff-btn:hover { border-color: #f44; color: #f44; }
+.diff-btn.active {
+  background: #f44;
+  border-color: #f44;
+  color: #fff;
+}
+
+.diff-desc {
+  font-size: 0.8rem;
+  color: #888;
+  min-height: 1.2em;
+}
+
+.start-btn {
+  margin-top: 0.5rem;
+  padding: 0.8rem 3rem;
+  background: #f44;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.start-btn:hover { background: #f66; }
+
+.menu-hint {
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  color: #666;
+  letter-spacing: 0.05em;
+}
+.hint-mobile { display: none; }
+
+/* ===== Win / Lose Screens ===== */
+.win-title {
+  font-size: clamp(2rem, 6vw, 4rem);
+  color: #4f4;
+  text-shadow: 0 0 20px #4f4;
+  letter-spacing: 0.15em;
+}
+.lose-title {
+  font-size: clamp(2rem, 6vw, 4rem);
+  color: #f44;
+  text-shadow: 0 0 20px #f44;
+  letter-spacing: 0.15em;
+}
+.overlay-sub {
+  color: #aaa;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+}
+.overlay-btn {
+  padding: 0.7rem 2.5rem;
+  background: #f44;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: background 0.15s;
+  min-width: 160px;
+}
+.overlay-btn:hover { background: #f66; }
+.overlay-btn.secondary {
+  background: transparent;
+  border: 2px solid #555;
+  color: #aaa;
+}
+.overlay-btn.secondary:hover { border-color: #f44; color: #f44; }
+
+/* ===== HUD Layer ===== */
+#hudLayer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+#hudLayer.visible { display: block; }
+
+/* Crosshair */
+#crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1;
+  text-shadow: 0 0 3px #000;
+}
+
+/* Bottom HUD bar */
+#hudBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 1rem;
+}
+
+#hudLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#hudHpNum {
+  font-size: 1rem;
+  color: #f88;
+  min-width: 2.5em;
+  text-align: right;
+}
+
+#hudHpBarWrap {
+  width: 120px;
+  height: 14px;
+  background: #333;
+  border: 1px solid #555;
+  overflow: hidden;
+}
+
+#hudHpFill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, #c22, #f44);
+  transition: width 0.1s;
+}
+
+#hudKey {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.5rem;
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+#hudKey.collected { opacity: 1.0; }
+
+#keyIcon { font-size: 1.1rem; }
+#keyLabel { font-size: 0.7rem; letter-spacing: 0.1em; color: #fc0; }
+
+/* Notification */
+#notification {
+  position: absolute;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: #fc0;
+  padding: 0.4rem 1.2rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  opacity: 0;
+  transition: opacity 0.4s;
+  white-space: nowrap;
+  pointer-events: none;
+}
+#notification.show { opacity: 1; }
+
+/* ===== Mobile Controls ===== */
+#mobileControls {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+#joystickBase {
+  position: absolute;
+  bottom: 80px;
+  left: 40px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.3);
+  display: none; /* shown only while finger is down */
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#joystickThumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  border: 2px solid rgba(255,255,255,0.8);
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+}
+
+#fireBtn {
+  position: absolute;
+  bottom: 64px;
+  right: 32px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(200,40,40,0.75);
+  border: 3px solid rgba(255,80,80,0.8);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Show mobile controls on touch devices, hide on fine pointer (desktop) */
+@media (pointer: coarse) {
+  #mobileControls { display: block; }
+  .hint-desktop { display: none; }
+  .hint-mobile { display: inline; }
+  #hudHpBarWrap { width: 80px; }
+  #fireBtn { pointer-events: auto; }
+}
