@@ -118,6 +118,8 @@ if (fireBtnEl) {
 }
 
 document.addEventListener('touchstart', (e) => {
+  // Let taps on interactive elements (buttons, links) pass through normally
+  if (e.target.closest('button, a, input, select')) return;
   e.preventDefault();
   for (const touch of e.changedTouches) {
     const tx = touch.clientX;
@@ -164,6 +166,7 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('button, a, input, select')) return;
   e.preventDefault();
   for (const touch of e.changedTouches) {
     if (touch.identifier === controls._joystickTouchId) {
